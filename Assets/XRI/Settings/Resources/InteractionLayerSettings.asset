@@ -19,10 +19,10 @@ MonoBehaviour:
   - Wrist
   - Pedestal
   - Raycasts
-  - 
-  - 
-  - 
-  - 
+  - Knight
+  - Rook
+  - Pawn
+  - Bishop
   - 
   - 
   - 
