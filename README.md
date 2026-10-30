@@ -51,9 +51,10 @@ The layout: you start in the storage room. The glass door at its north end leads
 | --- | --- |
 | Start UI | Welcome panel in front of you when the scene opens. Moving is switched off until you press Start |
 | Physics door | The glass door at the end of the storage room. Grab the bar handle on either side |
-| Grabbing | Boxes, tubes and containers on the storage shelves, the rope, the flashlight on a crate in the corner behind you on the left (trigger turns it on), the mug on the lounge desk, the origami crane on the projector |
-| Sockets | The chess board on the glass table at the far end of the lounge. Four pieces are missing and are hidden around the station: the white knight on the storage shelf, the black rook on top of the storage unit, the black pawn on the lounge floor by the plants, the white bishop under a cushion by the beds. When all four are back, the sign says "Well done!" and a success sound plays |
+| Grabbing | Boxes, tubes and containers on the storage shelves, the rope, the flashlight on a crate in the corner behind you on the left (trigger turns it on), the coffee mug on the lounge desk (tip it and the coffee pours out), the origami crane on the projector |
+| Sockets | The chess board on the glass table at the far end of the lounge. Four pieces are missing and are hidden around the station: the white knight on the storage shelf, the black rook on the storage room floor by the corridor, the black pawn on the lounge floor by the plants, the white bishop on the top bunk by the beds. The sign gives a hint, and when all four are back it says "Well done!" and a success sound plays |
 | In-room UI | B menu (Settings, Restart, Bruno Room), the settings panel, and the sign over the chess board |
+| Videos | The three monitors on the lounge desk play the course videos. Only the middle one has sound |
 | Teleporting | The whole floor is a teleportation area. The Start Mat and the Chess Mat are teleportation anchors |
 | Clocks | Analog and digital clock on the storage room wall, left of the glass door |
 | Sound | A machine humming by the big battery in the storage room, Bach playing in the lounge, and captions for both |
@@ -66,7 +67,7 @@ The layout: you start in the storage room. The glass door at its north end leads
 
 ### Both scenes
 
-The VR Room uses a copy of Bruno Room's XR rig and interface, so grabbing, teleporting, turning, the settings, haptics, click sounds and the fade are the same in both.
+The VR Room uses a copy of Bruno Room's XR rig and interface, so grabbing, teleporting, turning, the settings, haptics, click sounds and the fade are the same in both. The menus in both rooms use the same look, made with the free Dark UI pack: dark rounded panels with a thin blue frame and blue buttons.
 
 ## Scene navigation
 
@@ -122,6 +123,18 @@ What a socket accepts is decided by interaction layers. I added the layers Knigh
 
 Every grabbable has a Rigidbody, a non-trigger collider and an XR Grab Interactable with dynamic attach. Small things (chess pieces, mug, crane, flashlight) use Instantaneous movement. Boxes, tubes and containers use Velocity Tracking, so they bump into walls and shelves while you hold them. The hands grab with a Near-Far Interactor (close up, or with the hand ray) and play a haptic pulse and a click when you grab.
 
+### Coffee mug
+
+The mug works the same way as the watering can in Bruno Room, with course scripts only:
+
+- A thin dark brown disc (`Coffee`) sits just under the rim, so the mug looks full.
+- `Particle_Coffee` is the course's `Particle_Water` with a brown copy of its material (`Assets/Art/Coffee`). It sits at the rim and points out of the mug.
+- `OnTilt` on the mug checks how far the mug's up direction has turned towards the floor. Past the threshold (0.3, about 66 degrees) its On Begin event plays the particle (`ToggleParticle.Play`), starts the pouring sound (`PlayContinuousSound`, the same clip as the watering can) and hides the coffee disc. On End stops both and shows the disc again when you stand the mug back up.
+
+### Monitor videos
+
+Each monitor on the lounge desk has a quad placed exactly on its glass, with a Video Player and the course's `PlayVideo`. The Video Player is set to Material Override with `_BaseMap`, so the video frames go straight onto the quad's material. `PlayVideo` swaps in an unlit material when it starts so the video isn't darkened by the room's lighting. Play At Start and Loop are on. The middle monitor sends its sound to a 3D Audio Source that fades out within 5 metres. The side monitors are muted, so the lounge doesn't get noisy.
+
 ### Teleporting
 
 Teleporting needs a Teleportation Provider in the rig, under Locomotion with the Locomotion Mediator and XR Body Transformer. It also needs a ray interactor whose interaction layers overlap the target's (both use my Raycasts layer), and a target with a collider the ray can hit. You hold A/X or touch a stick to show the ray, aim, and let go to select.
@@ -132,6 +145,8 @@ A Teleportation Area lets you land anywhere on its colliders: in the VR Room it'
 
 The canvases are world space with a Tracked Device Graphic Raycaster, and the EventSystem uses the XR UI Input Module, so the hand rays and the poke interactors can press buttons. B is an `OnButtonPress` (course script) on the XR Origin, listening to the right controller's secondary button. Its events turn the menu on, hide the other panels and teleport you to the mat. The Start button hides the welcome panel and switches the Locomotion object on.
 
+The panels and buttons use sprites from the Dark UI pack. The sprites are white, so the Image color decides the final color. I gave the filled panel and button sprites 9-slice borders in their import settings, and set Pixels Per Unit Multiplier on each Image, so the round corners keep their shape at any size. The buttons use Color Tint transitions: blue normally, grey for Cancel and red for the reset Yes, a bit lighter when you point at them and darker when you press. Button text auto-sizes, so a long label like "Bruno Room" stays inside its button.
+
 ## Project layout
 
 | Folder | What's in it |
@@ -139,8 +154,9 @@ The canvases are world space with a Tracked Device Graphic Raycaster, and the Ev
 | `Assets/Scenes` | Bruno Room and VR Room, with their lighting settings and baked lighting |
 | `Assets/Scripts` | My scripts: HandAnimator, AnalogClock, DigitalClock, ReticleAnimator, BounceSound, RecordSpinner, plus the lesson's Polaroid and Photo |
 | `Assets/Prefabs` | Hand models and the digital clock |
-| `Assets/Art` | Hand models and skin material, paintings and materials |
+| `Assets/Art` | Hand models and skin material, coffee materials, paintings and materials |
 | `Assets/VR Room Assets` | The VR Room assets from the Intranet, with URP materials |
+| `Assets/Dark UI` | The free Dark UI pack, used for the menu panels and buttons |
 | `Assets/_Course Library` | The course's assets and scripts |
 
 In the hierarchy, Bruno Room is grouped under XR, LIGHTING, STATIC, DYNAMIC and INTERFACE. The VR Room keeps the asset's own Level and Interactables groups and adds XR, LIGHTING and INTERFACE.
@@ -153,14 +169,15 @@ In the hierarchy, Bruno Room is grouped under XR, LIGHTING, STATIC, DYNAMIC and 
 - Flashlight that turns on and off with the trigger
 - Settings menu (snap turning, distance grab, continuous movement, closed captions) in both rooms
 - Sound in the VR Room: a machine hum in the storage room and Bach in the lounge (3D sound that fades with distance), a sci-fi sound on Start, and closed captions that turn to face you
-- A goal: find the four missing chess pieces, with a "Well done!" and a success sound at the end
+- A goal: find the four missing chess pieces, with a hint on the sign, and a "Well done!" and a success sound at the end
+- A coffee mug that pours when you tip it, and videos playing on the lounge monitors
+- Menus restyled with the Dark UI pack in both rooms
 - Baked lighting in the VR Room too, with light probes and two reflection probes
 - The storage crates' colliders were taller than the crates, so things put on them floated. I fitted them to the crates.
+- Two of the chess pieces from the asset were out of reach (one on top of the storage unit, one under a cushion you can't move). I moved them where you can find them.
 
-## Known limitations
+## Design notes
 
-- The door has no latch, it swings both ways and stays where you leave it.
-- The fingers bend by the same angle at every joint. It looks like a natural grab, but there are no special poses like pointing.
-- Held objects can overlap the hand a little, since the hands stay visible while holding.
-- Only the right B button opens the menu, and it takes you back to the start mat.
-- Hand tracking isn't used. The hands follow the controllers.
+- The door has no latch on purpose. It swings both ways and stays where you leave it, so you can always get back from the lounge.
+- The hands follow the controllers instead of using hand tracking, because the controller buttons are needed for teleporting, turning and the menu.
+- The B button on the right controller opens the menu and also brings you back to the start mat, so the menu always opens in front of you.
