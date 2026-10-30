@@ -21974,8 +21974,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1415807834}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.6700133, y: -0.06722207, z: -0.33623493, w: 0.6584144}
-  m_LocalPosition: {x: 3.971964, y: 2.030046, z: -3.955952}
+  m_LocalRotation: {x: -0, y: 0.25881907, z: -0, w: 0.9659259}
+  m_LocalPosition: {x: 2.45, y: 0.18474539, z: -1.6}
   m_LocalScale: {x: 0.08000005, y: 0.080000095, z: 0.080000095}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -22447,8 +22447,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1436331146}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.6230966, y: 0.24259147, z: -0.4965417, w: 0.5534857}
-  m_LocalPosition: {x: 10.06, y: 0.208, z: 15.734}
+  m_LocalRotation: {x: -0, y: 0.9848078, z: -0, w: -0.17364821}
+  m_LocalPosition: {x: 9.3, y: 1.2583568, z: 15.3}
   m_LocalScale: {x: 0.08, y: 0.08, z: 0.08}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -36849,7 +36849,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: '<b>4 pieces are missing!</b>
 
-    Find them and put them back on the board.'
+    Two are in the storage room, two are
+    out here.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c8ac1ed6123904112adeaf50e63c4731, type: 2}
   m_sharedMaterial: {fileID: 1693478669045529817, guid: c8ac1ed6123904112adeaf50e63c4731, type: 2}
