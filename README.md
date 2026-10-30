@@ -12,7 +12,6 @@ Unity 6000.0.80f1, URP, XR Interaction Toolkit 3.1.3, OpenXR, built for the Meta
 
 1. Open the folder in Unity Hub with Unity 6000.0.80f1 (Android Build Support installed).
 2. Open `Assets/Scenes/Main Menu.unity` and press Play with a headset connected through Quest Link, or build to the Quest from File > Build Profiles (Android).
-   On the Quest, open the app from the Library while you're wearing the headset. If it starts while the headset is off your head (for example Build and Run with the headset on the desk), the Quest starts it muted, so quit it and open it again.
 3. All three scenes are in the build list: Main Menu is scene 0 and starts first, Bruno Room is scene 1, VR Room is scene 2.
 
 ## Controls
@@ -135,6 +134,10 @@ The mug's coaster works the same way. I added a fifth interaction layer, Mug. Th
 
 Every grabbable has a Rigidbody, a non-trigger collider and an XR Grab Interactable with dynamic attach. Small things (chess pieces, mug, crane, flashlight) use Instantaneous movement. Boxes, tubes and containers use Velocity Tracking, so they bump into walls and shelves while you hold them. The hands grab with a Near-Far Interactor (close up, or with the hand ray) and play a haptic pulse and a click when you grab.
 
+### Sound after Build and Run (`RestartAudioOnFocus.cs`)
+
+The Quest mutes an app while the headset is off your head. With Build and Run the app starts while the headset is still on the desk, and I found (by reading the Quest's logs over USB) that its sound stream then stayed muted even after I put the headset on, so there was no sound at all. `RestartAudioOnFocus` sits on the XR Origin in every scene. In `OnApplicationFocus` (line 13), every time the app gets focus back it waits a second (line 23) so the Quest has unmuted the app, then calls `AudioSettings.Mobile.StopAudioOutput` and `StartAudioOutput` (lines 25 to 27). That opens a fresh sound stream, which isn't muted. I tested it on the headset: started the app with the headset on the desk, put it on, and the music played.
+
 ### Coffee mug
 
 The mug works the same way as the watering can in Bruno Room, with course scripts only:
@@ -164,7 +167,7 @@ The panels and buttons use sprites from the Dark UI pack. The sprites are white,
 | Folder | What's in it |
 | --- | --- |
 | `Assets/Scenes` | Main Menu, Bruno Room and VR Room, with the rooms' lighting settings and baked lighting |
-| `Assets/Scripts` | My scripts: HandAnimator, AnalogClock, DigitalClock, ReticleAnimator, BounceSound, RecordSpinner, plus the lesson's Polaroid and Photo |
+| `Assets/Scripts` | My scripts: HandAnimator, AnalogClock, DigitalClock, SocketGoal, RestartAudioOnFocus, ReticleAnimator, BounceSound, RecordSpinner, plus the lesson's Polaroid and Photo |
 | `Assets/Prefabs` | Hand models and the digital clock |
 | `Assets/Art` | Hand models and skin material, coffee materials, paintings and materials |
 | `Assets/VR Room Assets` | The VR Room assets from the Intranet, with URP materials |
