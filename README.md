@@ -1,7 +1,8 @@
 # Enhanced Create with VR
 
-My project for the Enhanced Create with VR assignment. It has two scenes you can move between without restarting the app:
+My project for the Enhanced Create with VR assignment. It opens on a main menu and has two rooms you can move between without restarting the app:
 
+- **Main Menu**, where you pick a room
 - **Bruno Room**, the living room I built while following Unity Learn's Create with VR course
 - **VR Room**, a small space station built from the VR Room assets on the Intranet, with a glass door you open by its handle
 
@@ -10,8 +11,8 @@ Unity 6000.0.80f1, URP, XR Interaction Toolkit 3.1.3, OpenXR, built for the Meta
 ## Running it
 
 1. Open the folder in Unity Hub with Unity 6000.0.80f1 (Android Build Support installed).
-2. Open `Assets/Scenes/Bruno Room.unity` and press Play with a headset connected through Quest Link, or build to the Quest from File > Build Profiles (Android).
-3. Both scenes are in the build list: Bruno Room is scene 0 and starts first, VR Room is scene 1.
+2. Open `Assets/Scenes/Main Menu.unity` and press Play with a headset connected through Quest Link, or build to the Quest from File > Build Profiles (Android).
+3. All three scenes are in the build list: Main Menu is scene 0 and starts first, Bruno Room is scene 1, VR Room is scene 2.
 
 ## Controls
 
@@ -25,7 +26,7 @@ Unity 6000.0.80f1, URP, XR Interaction Toolkit 3.1.3, OpenXR, built for the Meta
 | Either thumbstick forward/back | Walk, when Continuous Movement is on in Settings |
 | B | Open the menu |
 
-The menu has Settings, Reset (Restart in the VR Room) and a button to go to the other room. Settings has snap turning, distance grab, continuous movement and closed captions. You can point at buttons with the hand ray and pull the trigger, or poke them with a finger.
+The menu has Settings, Reset (Restart in the VR Room), a button to go to the other room and a Main Menu button. Settings has snap turning, distance grab, continuous movement and closed captions. You can point at buttons with the hand ray and pull the trigger, or poke them with a finger.
 
 ## Course lessons completed
 
@@ -41,6 +42,12 @@ What the course gave Bruno Room: a modern room with a city view, teleporting wit
 
 ## What I added for this assignment
 
+### Main Menu scene (`Assets/Scenes/Main Menu.unity`)
+
+The app starts here. You stand on a round mat among the course's green hills, with quiet music (Beethoven's Moonlight Sonata), in front of a panel titled "Bruno's VR World" with two buttons: Bruno Room and VR Room. You point at a button with the hand ray and pull the trigger.
+
+I made it from a copy of Bruno Room and kept only the XR rig and the interface, so the hands, rays, poke, fade and Dark UI look are the same as in the rooms. Moving is switched off here (the Locomotion object is off), and B does nothing because there is no other menu to open. The scene has a realtime sun, so it needs no baked lighting.
+
 ### VR Room scene (`Assets/Scenes/VR Room.unity`)
 
 I copied the VR Room assets into `Assets/VR Room Assets` and converted their materials from the built-in shaders to URP (Standard ones with URP's own material upgrader, the leaves, origami and hologram particle materials by hand). The scene came with a camera only, and a lot of missing scripts left over from the project it was exported from, which I removed.
@@ -50,10 +57,10 @@ The layout: you start in the storage room. The glass door at its north end leads
 | Interaction | Where it is |
 | --- | --- |
 | Start UI | Welcome panel in front of you when the scene opens. Moving is switched off until you press Start |
-| Physics door | The glass door at the end of the storage room. Grab the bar handle on either side |
-| Grabbing | Boxes, tubes and containers on the storage shelves, the rope, the flashlight on a crate in the corner behind you on the left (trigger turns it on), the coffee mug on the lounge desk (tip it and the coffee pours out), the origami crane on the projector |
-| Sockets | The chess board on the glass table at the far end of the lounge. Four pieces are missing and are hidden around the station: the white knight on the storage shelf, the black rook on the storage room floor by the corridor, the black pawn on the lounge floor by the plants, the white bishop on the top bunk by the beds. The sign gives a hint, and when all four are back it says "Well done!" and a success sound plays |
-| In-room UI | B menu (Settings, Restart, Bruno Room), the settings panel, and the sign over the chess board |
+| Physics door | The glass door at the end of the storage room. Grab the bar handle on either side. It opens one way, into the lounge |
+| Grabbing | Boxes, tubes and containers on the storage shelves, the rope, the flashlight on a crate in the corner behind you on the left (trigger turns it on), the coffee mug on its coaster at the back corner of the lounge desk (tip it and the coffee pours out), the origami crane on the projector |
+| Sockets | The chess board on the glass table at the far end of the lounge. Four pieces are missing and are hidden around the station: the white knight on the storage shelf, the black rook on the storage room floor by the corridor, the black pawn on the lounge floor by the plants, the white bishop on the top bunk by the beds. The sign gives a hint, and when all four are back it says "Well done!" and a success sound plays. The mug's coaster is a fifth socket that only takes the mug |
+| In-room UI | B menu (Settings, Restart, Bruno Room, Main Menu), the settings panel, and the sign over the chess board |
 | Videos | The three monitors on the lounge desk play the course videos. Only the middle one has sound |
 | Teleporting | The whole floor is a teleportation area. The Start Mat and the Chess Mat are teleportation anchors |
 | Clocks | Analog and digital clock on the storage room wall, left of the glass door |
@@ -63,7 +70,7 @@ The layout: you start in the storage room. The glass door at its north end leads
 
 - Realistic animated hands instead of the blue course hands
 - A digital clock next to the analog clock on the wall above the TV
-- B now opens a menu with Settings, Reset Room and VR Room (reset still asks Yes/Cancel first)
+- B now opens a menu with Settings, Reset Room, VR Room and Main Menu (reset still asks Yes/Cancel first)
 
 ### Both scenes
 
@@ -71,7 +78,7 @@ The VR Room uses a copy of Bruno Room's XR rig and interface, so grabbing, telep
 
 ## Scene navigation
 
-Press B in either room and pick the other room in the menu. The button calls `LoadScene.LoadSceneUsingName` from the course library with "VR Room" or "Bruno Room", which loads that scene with `SceneManager.LoadScene`.
+The app starts in the Main Menu, where you pick a room. In either room, press B and pick the other room or Main Menu. Every one of these buttons calls `LoadScene.LoadSceneUsingName` from the course library with the scene's name ("Bruno Room", "VR Room" or "Main Menu"), which loads that scene with `SceneManager.LoadScene`.
 
 Every scene has its own complete rig (XR Origin, Input Action Manager, XR Interaction Manager and EventSystem). Nothing is kept with DontDestroyOnLoad, so the old scene is unloaded completely and the new one starts with a fresh rig. There are never two XR Origins or two event systems, and input, grabbing and UI work the same after every switch. When a scene loads, `OnSceneLoad` on the Scene Loader object calls `FadeCanvas.StartFadeOut`, so the view fades in from black instead of jumping.
 
@@ -105,11 +112,11 @@ Each hand is set to its starting rotation times a turn around its Y axis, which 
 
 The door model was a sliding door played by an Animator. I removed the Animator and turned it into a hinged door:
 
-- The door leaf (`glass_panel_1_door`) has a Box Collider, a Rigidbody (mass 3, no gravity, angular damping 5) and a Hinge Joint. The joint's anchor is on the leaf's own pivot, which is on its hinge edge, the axis is up, limits are -90 to 90 so you can push or pull it from either room, and it has no connected body, so it's attached to the world and can't come off.
+- The door leaf (`glass_panel_1_door`) has a Box Collider, a Rigidbody (mass 3, no gravity, angular damping 5) and a Hinge Joint. The joint's anchor is on the leaf's own pivot, which is on its hinge edge, the axis is up, limits are -90 to 0 so it only opens one way, into the lounge, like a real door (0 is closed, so it stops against the frame), and it has no connected body, so it's attached to the world and can't come off.
 - The frame's mesh collider is replaced by three Box Colliders (both sides and above the doorway) that leave a few centimetres free around the leaf, so the door doesn't rub on its own frame.
 - A Handle child sits on the bar of the door model. It has a Box Collider around the bar on both faces, its own Rigidbody, a Fixed Joint to the leaf and an XR Grab Interactable: movement type Velocity Tracking, Track Rotation off, Throw On Detach off, Far Attach Mode Far, Use Dynamic Attach on, velocity scale 0.6. These are the same settings as Bruno Room's cabinet door handles.
 
-While you hold the handle, velocity tracking sets the handle's velocity towards your hand on every physics step. The fixed joint pulls the leaf with it and the hinge only lets the leaf turn around the hinge line, so the door follows your hand continuously. When you let go, the angular damping stops it. Far attach and dynamic attach keep the handle where you grabbed it instead of pulling it to your hand, which would yank the door. I tested this in the editor by moving the handle around the hinge the same way velocity tracking does, and the door followed within 1 degree all the way to 75 degrees each way.
+While you hold the handle, velocity tracking sets the handle's velocity towards your hand on every physics step. The fixed joint pulls the leaf with it and the hinge only lets the leaf turn around the hinge line, so the door follows your hand continuously. When you let go, the angular damping stops it. Far attach and dynamic attach keep the handle where you grabbed it instead of pulling it to your hand, which would yank the door. I tested this in the editor by moving the handle around the hinge the same way velocity tracking does, and the door followed within 1 degree all the way to 75 degrees. I also pushed the handle from each side in a physics test: pushed from the storage room it opens to 90 degrees, pushed from the lounge side it stays shut.
 
 ### Sockets and filtering
 
@@ -118,6 +125,8 @@ Each of the four sockets on the chess board is an XR Socket Interactor with a sm
 What a socket accepts is decided by interaction layers. I added the layers Knight, Rook, Pawn and Bishop. The knight's XR Grab Interactable has Default + Knight, and the knight socket's Interaction Layer Mask is Knight only. An interactor and an interactable can only interact if their masks share a layer, so the knight socket can't take the rook, the pawn or a box. The hands use Default, so they can still grab every piece and take it back out of a socket. Each socket plays a click (`PlayQuickSound`) on Select Entered.
 
 `SocketGoal` (`Assets/Scripts/SocketGoal.cs`) sits on the Chess Sockets object and has the four sockets in a list. Every frame it checks `hasSelection` on each one, and the first time all four are holding a piece it runs its `OnAllFilled` event. In the scene that event hides the task text on the sign, shows "Well done!" and plays `SFX_Game_Success`.
+
+The mug's coaster works the same way. I added a fifth interaction layer, Mug. The mug has Default + Mug and the Mug Socket on the coaster has Mug only, so no chess piece or box can go on the coaster, and the mug can't go in a chess socket. The socket's Starting Selected Interactable is the mug, so the mug starts on its coaster. I moved the mug and coaster to the back corner of the desk, about a metre from the keyboards, so it can't spill on them.
 
 ### Grabbing
 
@@ -145,13 +154,13 @@ A Teleportation Area lets you land anywhere on its colliders: in the VR Room it'
 
 The canvases are world space with a Tracked Device Graphic Raycaster, and the EventSystem uses the XR UI Input Module, so the hand rays and the poke interactors can press buttons. B is an `OnButtonPress` (course script) on the XR Origin, listening to the right controller's secondary button. Its events turn the menu on, hide the other panels and teleport you to the mat. The Start button hides the welcome panel and switches the Locomotion object on.
 
-The panels and buttons use sprites from the Dark UI pack. The sprites are white, so the Image color decides the final color. I gave the filled panel and button sprites 9-slice borders in their import settings, and set Pixels Per Unit Multiplier on each Image, so the round corners keep their shape at any size. The buttons use Color Tint transitions: blue normally, grey for Cancel and red for the reset Yes, a bit lighter when you point at them and darker when you press. Button text auto-sizes, so a long label like "Bruno Room" stays inside its button.
+The panels and buttons use sprites from the Dark UI pack. The sprites are white, so the Image color decides the final color. I gave the filled panel and button sprites 9-slice borders in their import settings, and set Pixels Per Unit Multiplier on each Image, so the round corners keep their shape at any size. The buttons use Color Tint transitions: blue normally, grey for Cancel and red for the reset Yes, a bit lighter when you point at them and darker when you press. The four buttons in the B menu share one text size, small enough that "Bruno Room" fits on one line.
 
 ## Project layout
 
 | Folder | What's in it |
 | --- | --- |
-| `Assets/Scenes` | Bruno Room and VR Room, with their lighting settings and baked lighting |
+| `Assets/Scenes` | Main Menu, Bruno Room and VR Room, with the rooms' lighting settings and baked lighting |
 | `Assets/Scripts` | My scripts: HandAnimator, AnalogClock, DigitalClock, ReticleAnimator, BounceSound, RecordSpinner, plus the lesson's Polaroid and Photo |
 | `Assets/Prefabs` | Hand models and the digital clock |
 | `Assets/Art` | Hand models and skin material, coffee materials, paintings and materials |
@@ -163,6 +172,7 @@ In the hierarchy, Bruno Room is grouped under XR, LIGHTING, STATIC, DYNAMIC and 
 
 ## Other additions
 
+- A Main Menu scene where the app starts, with a Main Menu button in both rooms' menus
 - Fade in when a scene loads
 - Start button that unlocks moving, so you read the instructions first
 - Sign over the chess board telling you what to do, and a click when a piece goes back in
@@ -170,7 +180,7 @@ In the hierarchy, Bruno Room is grouped under XR, LIGHTING, STATIC, DYNAMIC and 
 - Settings menu (snap turning, distance grab, continuous movement, closed captions) in both rooms
 - Sound in the VR Room: a machine hum in the storage room and Bach in the lounge (3D sound that fades with distance), a sci-fi sound on Start, and closed captions that turn to face you
 - A goal: find the four missing chess pieces, with a hint on the sign, and a "Well done!" and a success sound at the end
-- A coffee mug that pours when you tip it, and videos playing on the lounge monitors
+- A coffee mug that pours when you tip it and sits on a coaster socket made only for it, and videos playing on the lounge monitors
 - Menus restyled with the Dark UI pack in both rooms
 - Baked lighting in the VR Room too, with light probes and two reflection probes
 - The storage crates' colliders were taller than the crates, so things put on them floated. I fitted them to the crates.
@@ -178,6 +188,7 @@ In the hierarchy, Bruno Room is grouped under XR, LIGHTING, STATIC, DYNAMIC and 
 
 ## Design notes
 
-- The door has no latch on purpose. It swings both ways and stays where you leave it, so you can always get back from the lounge.
+- The door opens one way like a real door, into the lounge. It has no latch on purpose: it stays where you leave it, and from the lounge you pull it open by the handle.
+- All sounds use Unity's own 3D sound (Spatial Blend set to 3D), so they get quieter with distance and come from the left or right. I don't use a spatializer plugin, so nothing extra has to load on the Quest.
 - The hands follow the controllers instead of using hand tracking, because the controller buttons are needed for teleporting, turning and the menu.
 - The B button on the right controller opens the menu and also brings you back to the start mat, so the menu always opens in front of you.
