@@ -8,6 +8,8 @@ My project for the Enhanced Create with VR assignment. It opens on a main menu a
 
 Unity 6000.0.80f1, URP, XR Interaction Toolkit 3.1.3, OpenXR, built for the Meta Quest 2.
 
+Video (playing it in the headset, then the Unity setup and code): https://www.youtube.com/watch?v=HcwbF1lmywM
+
 ## Running it
 
 1. Open the folder in Unity Hub with Unity 6000.0.80f1 (Android Build Support installed).
