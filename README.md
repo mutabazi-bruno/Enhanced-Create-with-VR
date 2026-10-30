@@ -12,6 +12,7 @@ Unity 6000.0.80f1, URP, XR Interaction Toolkit 3.1.3, OpenXR, built for the Meta
 
 1. Open the folder in Unity Hub with Unity 6000.0.80f1 (Android Build Support installed).
 2. Open `Assets/Scenes/Main Menu.unity` and press Play with a headset connected through Quest Link, or build to the Quest from File > Build Profiles (Android).
+   On the Quest, open the app from the Library while you're wearing the headset. If it starts while the headset is off your head (for example Build and Run with the headset on the desk), the Quest starts it muted, so quit it and open it again.
 3. All three scenes are in the build list: Main Menu is scene 0 and starts first, Bruno Room is scene 1, VR Room is scene 2.
 
 ## Controls
@@ -46,7 +47,7 @@ What the course gave Bruno Room: a modern room with a city view, teleporting wit
 
 The app starts here. You stand on a round mat among the course's green hills, with quiet music (Beethoven's Moonlight Sonata), in front of a panel titled "Bruno's VR World" with two buttons: Bruno Room and VR Room. You point at a button with the hand ray and pull the trigger.
 
-I made it from a copy of Bruno Room and kept only the XR rig and the interface, so the hands, rays, poke, fade and Dark UI look are the same as in the rooms. Moving is switched off here (the Locomotion object is off), and B does nothing because there is no other menu to open. The scene has a realtime sun, so it needs no baked lighting.
+I made it from a copy of Bruno Room and kept only the XR rig and the interface, so the hands, rays, poke, fade and Dark UI look are the same as in the rooms. There's no teleport floor here, only the mat you stand on, and B does nothing because there is no other menu to open. When the scene loads, the course's `TeleportPlayer` puts you on the mat facing the menu. The scene has a realtime sun, so it needs no baked lighting.
 
 ### VR Room scene (`Assets/Scenes/VR Room.unity`)
 
@@ -56,7 +57,7 @@ The layout: you start in the storage room. The glass door at its north end leads
 
 | Interaction | Where it is |
 | --- | --- |
-| Start UI | Welcome panel in front of you when the scene opens. Moving is switched off until you press Start |
+| Start UI | Welcome panel in front of you when the scene opens, with the instructions and a Start button that closes it |
 | Physics door | The glass door at the end of the storage room. Grab the bar handle on either side. It opens one way, into the lounge |
 | Grabbing | Boxes, tubes and containers on the storage shelves, the rope, the flashlight on a crate in the corner behind you on the left (trigger turns it on), the coffee mug on its coaster at the back corner of the lounge desk (tip it and the coffee pours out), the origami crane on the projector |
 | Sockets | The chess board on the glass table at the far end of the lounge. Four pieces are missing and are hidden around the station: the white knight on the storage shelf, the black rook on the storage room floor by the corridor, the black pawn on the lounge floor by the plants, the white bishop on the top bunk by the beds. The sign gives a hint, and when all four are back it says "Well done!" and a success sound plays. The mug's coaster is a fifth socket that only takes the mug |
@@ -81,6 +82,8 @@ The VR Room uses a copy of Bruno Room's XR rig and interface, so grabbing, telep
 The app starts in the Main Menu, where you pick a room. In either room, press B and pick the other room or Main Menu. Every one of these buttons calls `LoadScene.LoadSceneUsingName` from the course library with the scene's name ("Bruno Room", "VR Room" or "Main Menu"), which loads that scene with `SceneManager.LoadScene`.
 
 Every scene has its own complete rig (XR Origin, Input Action Manager, XR Interaction Manager and EventSystem). Nothing is kept with DontDestroyOnLoad, so the old scene is unloaded completely and the new one starts with a fresh rig. There are never two XR Origins or two event systems, and input, grabbing and UI work the same after every switch. When a scene loads, `OnSceneLoad` on the Scene Loader object calls `FadeCanvas.StartFadeOut`, so the view fades in from black instead of jumping.
+
+Every scene also puts you in the right place when it loads. The headset's position is measured from the centre of your play area, so without help you'd appear wherever you're standing in your real room, and in the small storage room that can be outside the walls. The course's `TeleportPlayer` on the XR Origin asks the Teleportation Provider to teleport you onto the scene's start mat in its `Start`, facing the menu. For that to work the Locomotion object has to be on when the scene loads, so it's on in all three scenes.
 
 ## Code walkthrough
 
@@ -152,7 +155,7 @@ A Teleportation Area lets you land anywhere on its colliders: in the VR Room it'
 
 ### UI
 
-The canvases are world space with a Tracked Device Graphic Raycaster, and the EventSystem uses the XR UI Input Module, so the hand rays and the poke interactors can press buttons. B is an `OnButtonPress` (course script) on the XR Origin, listening to the right controller's secondary button. Its events turn the menu on, hide the other panels and teleport you to the mat. The Start button hides the welcome panel and switches the Locomotion object on.
+The canvases are world space with a Tracked Device Graphic Raycaster, and the EventSystem uses the XR UI Input Module, so the hand rays and the poke interactors can press buttons. B is an `OnButtonPress` (course script) on the XR Origin, listening to the right controller's secondary button. Its events turn the menu on, hide the other panels and teleport you to the mat. The Start button hides the welcome panel and plays a sound.
 
 The panels and buttons use sprites from the Dark UI pack. The sprites are white, so the Image color decides the final color. I gave the filled panel and button sprites 9-slice borders in their import settings, and set Pixels Per Unit Multiplier on each Image, so the round corners keep their shape at any size. The buttons use Color Tint transitions: blue normally, grey for Cancel and red for the reset Yes, a bit lighter when you point at them and darker when you press. The four buttons in the B menu share one text size, small enough that "Bruno Room" fits on one line.
 
@@ -174,7 +177,7 @@ In the hierarchy, Bruno Room is grouped under XR, LIGHTING, STATIC, DYNAMIC and 
 
 - A Main Menu scene where the app starts, with a Main Menu button in both rooms' menus
 - Fade in when a scene loads
-- Start button that unlocks moving, so you read the instructions first
+- A welcome panel with the instructions and a Start button in the VR Room
 - Sign over the chess board telling you what to do, and a click when a piece goes back in
 - Flashlight that turns on and off with the trigger
 - Settings menu (snap turning, distance grab, continuous movement, closed captions) in both rooms
@@ -189,6 +192,6 @@ In the hierarchy, Bruno Room is grouped under XR, LIGHTING, STATIC, DYNAMIC and 
 ## Design notes
 
 - The door opens one way like a real door, into the lounge. It has no latch on purpose: it stays where you leave it, and from the lounge you pull it open by the handle.
-- All sounds use Unity's own 3D sound (Spatial Blend set to 3D), so they get quieter with distance and come from the left or right. I don't use a spatializer plugin, so nothing extra has to load on the Quest.
+- All sounds use Unity's own 3D sound (Spatial Blend set to 3D), so they get quieter with distance and come from the left or right.
 - The hands follow the controllers instead of using hand tracking, because the controller buttons are needed for teleporting, turning and the menu.
 - The B button on the right controller opens the menu and also brings you back to the start mat, so the menu always opens in front of you.
