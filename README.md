@@ -173,6 +173,9 @@ The panels and buttons use sprites from the Dark UI pack. The sprites are white,
 | `Assets/VR Room Assets` | The VR Room assets from the Intranet, with URP materials |
 | `Assets/Dark UI` | The free Dark UI pack, used for the menu panels and buttons |
 | `Assets/_Course Library` | The course's assets and scripts |
+| `Assets/AllSkyFree` | The free AllSky pack. Only the blue sky that Bruno Room and the Main Menu use is in the repo, the other skies are left out by `.gitignore` |
+| `Assets/Challenges` | The fixed scenes from the three course challenges |
+| `Assets/Samples`, `Settings`, `Resources`, `TextMesh Pro`, `XR`, `XRI` | Made by Unity and its packages (XR Interaction Toolkit samples, URP settings, Meta audio settings, TextMesh Pro, XR plug-in and interaction layer settings). They stay where the packages expect them |
 
 In the hierarchy, Bruno Room is grouped under XR, LIGHTING, STATIC, DYNAMIC and INTERFACE. The VR Room keeps the asset's own Level and Interactables groups and adds XR, LIGHTING and INTERFACE.
 
